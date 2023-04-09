@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <div id="shopping-list">
+        <div class="header">
+            <h1>{{header || 'Welcome'}}</h1>
+            <button v-if="editing" @click="deEdit()" class="btn btn-cancel">Cancel</button>
+            <button v-else @click="deEdit()" class="btn btn-add">Add Item</button>
+        </div>
+        <div v-if="editing" class="add-item-form">
+            <input @keyup.enter="saveItem" v-model.lazy="newItem" type="text" placeholder="Add an item">
+            <label>
+                <input type="checkbox" v-model="newItemHighPriority">
+                High Priority
+            </label>
+            <button :disabled="newItem.length === 0" @click="saveItem" class="btn btn-primary">Save Item</button>
+        </div>
+        <p v-if="items.length === 0">Nice job! You've bought all your items!</p>
+        <ul>
+            <li v-for="item in reversedItem" :key="item.id"
+                :class="{strikeout: item.purchased, priority: item.highPriority}" @click="togglePurchased(item)">
+                {{item.label}}</li>
+        </ul>
+    </div>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    header: 'Shopping List App',
+                    editing: false,
+                    newItem: '',
+                    newItemHighPriority: false,
+                    items: [
+                        { id: 1, label: '10 party hats', purchased: true, highPriority: false },
+                        { id: 2, label: 'board games', purchased: true, highPriority: false },
+                        { id: 3, label: '20 cups', purchased: false, highPriority: true },
+                    ]
+                }
+            },
+            computed: {
+                reversedItem() {
+                    return [...this.items].reverse()
+                },
+            },
+            methods: {
+                saveItem() {
+                    this.items.push({
+                        id: this.items.length + 1,
+                        label: this.newItem,
+                        highPriority: this.newItemHighPriority,
+                    })
+                    this.newItem = ""
+                    newItemHighPriority = ""
+                },
+                deEdit() {
+                    this.editing = !this.editing
+                    this.newItem = ""
+                    newItemHighPriority = ""
+                },
+                togglePurchased(item) {
+                    item.purchased = !item.purchased
+                },
+            },
+        })
+
+            .mount('#shopping-list')
+    </script>
+</body>
+
+</html>
